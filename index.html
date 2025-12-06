@@ -1530,10 +1530,10 @@
                 }
             });
 
-            // Load news from news.txt file
+            // Load news from news.txt file - БЕЗ КЭШИРОВАНИЯ
             async function loadNews() {
                 try {
-                    const response = await fetch('news.txt');
+                    const response = await fetch('news.txt', {cache: 'no-cache'});
                     if (!response.ok) {
                         throw new Error('Файл новостей не найден');
                     }
@@ -1690,10 +1690,6 @@
             document.querySelectorAll('.game-card, .about-content').forEach(el => {
                 observer.observe(el);
             });
-
-            // Initial load check for news
-            // (опционально - предзагрузка новостей при загрузке страницы)
-            // loadNews();
         });
     </script>
 </body>
