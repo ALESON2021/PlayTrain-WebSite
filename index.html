@@ -5,13 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlayTrain - Железнодорожные симуляторы</title>
     <link rel="icon" type="image/jpg" href="favicon.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* CSS Reset & Variables */
         :root {
-            --primary-color: #0a1a35;
-            --secondary-color: #1a2f5a;
-            --accent-color: #2a4b8c;
-            --text-color: #ffffff;
-            --highlight-color: #4a7bd9;
+            --primary-dark: #0A192F;
+            --primary-blue: #1E3A8A;
+            --accent-blue: #3B82F6;
+            --accent-teal: #06D6A0;
+            --accent-orange: #FF9E00;
+            --neutral-white: #F8FAFC;
+            --neutral-gray: #94A3B8;
+            --neutral-dark: #1E293B;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
         }
 
         * {
@@ -25,308 +33,451 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            line-height: 1.6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1a1a2e 100%);
+            color: var(--neutral-white);
+            line-height: 1.7;
             overflow-x: hidden;
         }
 
-        /* Шапка */
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--neutral-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 5px;
+        }
+
+        /* Utility Classes */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal));
+            border-radius: 2px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--primary-blue));
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-rustore {
+            background: linear-gradient(90deg, #FF3C00, #FF6B35);
+            box-shadow: 0 5px 15px rgba(255, 60, 0, 0.3);
+        }
+
+        .btn-rustore:hover {
+            box-shadow: 0 10px 25px rgba(255, 60, 0, 0.5);
+        }
+
+        .btn-telegram {
+            background: linear-gradient(90deg, #0088cc, #00aced);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
+        }
+
+        .btn-telegram:hover {
+            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.5);
+        }
+
+        /* Header - Modern Sticky */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background-color: var(--secondary-color);
-            padding: 15px 5%;
+            z-index: 1000;
+            padding: 20px 0;
+            transition: var(--transition);
+            background: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        header.scrolled {
+            padding: 15px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            transform: translateY(-100%);
-            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
-        header.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .header-logo {
+        .logo-brand {
             display: flex;
             align-items: center;
+            gap: 15px;
+            text-decoration: none;
         }
 
         .logo-small {
-            height: 40px;
-            margin-right: 15px;
+            height: 50px;
+            border-radius: 10px;
         }
 
-        .company-name {
-            font-size: 1.5rem;
-            font-weight: bold;
+        .brand-text h1 {
+            font-size: 1.8rem;
+            color: var(--neutral-white); /* Изменено: белый вместо градиента */
         }
 
-        .header-motto {
+        .brand-text p {
+            font-size: 0.9rem;
+            color: var(--neutral-gray);
             font-style: italic;
-            opacity: 0.8;
         }
 
-        /* Первый экран */
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--neutral-white);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-teal);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Hero Section - Fullscreen Parallax */
         .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--primary-color);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .hero-logo {
-            width: 80%;
-            max-width: 600px;
-            margin-bottom: 30px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 1s ease, transform 1s ease;
-        }
-
-        .hero-title {
-            font-size: 3rem;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 1s ease 0.2s, transform 1s ease 0.2s;
-        }
-
-        .hero.visible .hero-logo,
-        .hero.visible .hero-title {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Секция "О компании" */
-        .about-section {
-            min-height: 60vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 80px 5%;
-            position: relative;
-            opacity: 0;
-            transform: translateY(50px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .about-section.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .about-content {
-            max-width: 800px;
-            text-align: center;
-        }
-
-        .about-title {
-            font-size: 2.8rem;
-            color: var(--highlight-color);
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        .about-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 3px;
-            background-color: var(--highlight-color);
-        }
-
-        .about-description {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 30px;
-        }
-
-        /* Секция "Наши продукты" */
-        .products-title-section {
-            padding: 40px 5%;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(50px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .products-title-section.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .products-title {
-            font-size: 2.8rem;
-            color: var(--highlight-color);
-            position: relative;
-        }
-
-        .products-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 3px;
-            background-color: var(--highlight-color);
-        }
-
-        /* Секции с играми */
-        .game-section {
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 100px 5%;
+            text-align: center;
             position: relative;
-            opacity: 0;
-            transform: translateY(50px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .game-section.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .game-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .game-text {
-            padding-right: 20px;
-        }
-
-        .game-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .game-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 15px;
-            margin-right: 20px;
-            object-fit: cover;
-        }
-
-        .game-title {
-            font-size: 2.5rem;
-            color: var(--highlight-color);
-        }
-
-        .game-description {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-        }
-
-        .game-features {
-            list-style-type: none;
-            margin-bottom: 30px;
-        }
-
-        .game-features li {
-            margin-bottom: 15px;
-            padding-left: 25px;
-            position: relative;
-        }
-
-        .game-features li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--highlight-color);
-            font-weight: bold;
-        }
-
-        .game-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: var(--accent-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        .btn:hover {
-            background-color: var(--highlight-color);
-            transform: translateY(-3px);
-        }
-
-        .btn-rustore {
-            background-color: #ff3c00;
-        }
-
-        .btn-rustore:hover {
-            background-color: #ff5c2a;
-        }
-
-        .btn-telegram {
-            background-color: #0088cc;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-telegram:hover {
-            background-color: #0099e6;
-        }
-
-        .tg-icon {
-            width: 24px;
-            height: 20px;
-        }
-
-        .game-screenshots {
-            position: relative;
-            height: 500px;
             overflow: hidden;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding-top: 100px;
         }
 
-        .screenshot {
+        .hero:before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 0.8s ease;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(6, 214, 160, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 158, 0, 0.1) 0%, transparent 50%);
+            z-index: -1;
         }
 
-        .screenshot.active {
+        .hero-logo {
+            width: 80%;
+            max-width: 700px;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--neutral-gray);
+            max-width: 800px;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 20px;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 60px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--card-shadow);
+        }
+
+        .about-text {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: var(--neutral-gray);
+        }
+
+        /* Games Section */
+        .games-section {
+            padding: 100px 0;
+        }
+
+        .games-filter {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--neutral-white);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--accent-blue);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-blue);
+        }
+
+        .game-header {
+            padding: 30px 30px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .game-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 2px solid var(--accent-blue);
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            color: var(--neutral-white);
+        }
+
+        .game-description {
+            padding: 0 30px;
+            flex-grow: 1;
+            color: var(--neutral-gray);
+            margin-bottom: 20px;
+        }
+
+        .game-features {
+            padding: 0 30px;
+            margin-bottom: 25px;
+        }
+
+        .game-features li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+            color: var(--neutral-gray);
+        }
+
+        .game-features li:before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: var(--accent-teal);
+            font-size: 0.8rem;
+        }
+
+        .game-buttons {
+            padding: 0 30px 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Game Detail Modal */
+        .game-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            padding: 20px;
+        }
+
+        .game-modal.active {
             opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--primary-dark);
+            border-radius: 24px;
+            max-width: 1200px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid var(--accent-blue);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--accent-blue);
+        }
+
+        .modal-screenshots {
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .screenshot-slider {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease;
+        }
+
+        .modal-screenshot {
+            min-width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .screenshot-nav {
@@ -337,107 +488,142 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            z-index: 10;
+            z-index: 5;
         }
 
         .nav-dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.3);
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: var(--transition);
         }
 
         .nav-dot.active {
-            background-color: var(--highlight-color);
+            background: var(--accent-blue);
+            transform: scale(1.2);
         }
 
-        .screenshot-arrows {
+        .modal-arrows {
             position: absolute;
             top: 50%;
+            left: 0;
             width: 100%;
             display: flex;
             justify-content: space-between;
-            transform: translateY(-50%);
             padding: 0 20px;
-            z-index: 10;
+            transform: translateY(-50%);
+            z-index: 5;
         }
 
-        .arrow {
-            width: 40px;
-            height: 40px;
-            background-color: rgba(0, 0, 0, 0.5);
+        .modal-arrow {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 50%;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
             cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 20px;
-            color: white;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
         }
 
-        .arrow:hover {
-            background-color: rgba(0, 0, 0, 0.8);
+        .modal-arrow:hover {
+            background: var(--accent-blue);
         }
 
-        /* Для горизонтальных скриншотов (МЦД) */
-        .horizontal-screenshots .screenshot {
-            object-fit: cover;
+        .modal-body {
+            padding: 40px;
         }
 
-        /* Чередование расположения текста и изображений */
-        .game-section:nth-child(even) .game-container {
-            direction: rtl;
+        .modal-game-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
         }
 
-        .game-section:nth-child(even) .game-text {
-            direction: ltr;
-            padding-right: 0;
-            padding-left: 20px;
-        }
-
-        /* Подвал */
+        /* Footer */
         footer {
-            background-color: var(--secondary-color);
-            padding: 40px 0;
-            text-align: center;
+            background: var(--neutral-dark);
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--neutral-white);
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--accent-blue);
         }
 
         .footer-logo {
             height: 80px;
             margin-bottom: 20px;
+            border-radius: 15px;
         }
 
-        .copyright {
-            margin-top: 20px;
-            opacity: 0.8;
+        .footer-about {
+            color: var(--neutral-gray);
+            line-height: 1.8;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--neutral-gray);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-blue);
+            transform: translateX(5px);
         }
 
         .telegram-promo {
-            margin: 30px 0;
-            padding: 20px;
-            background-color: rgba(0, 136, 204, 0.2);
-            border-radius: 10px;
-            display: inline-block;
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.1), rgba(0, 172, 237, 0.1));
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 136, 204, 0.3);
         }
 
-        /* Блок разработчика */
         .developer-info {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .developer-avatar {
@@ -445,92 +631,93 @@
             height: 60px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid var(--highlight-color);
+            border: 2px solid var(--accent-teal);
         }
 
         .developer-text {
+            color: var(--neutral-gray);
             font-size: 0.9rem;
-            opacity: 0.8;
         }
 
-        /* Адаптивность */
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            color: var(--neutral-gray);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive Design */
         @media (max-width: 1024px) {
-            .game-container {
-                grid-template-columns: 1fr;
-                gap: 40px;
+            .hero-title {
+                font-size: 3.5rem;
             }
             
-            .game-section:nth-child(even) .game-container {
-                direction: ltr;
+            .section-title {
+                font-size: 2.5rem;
             }
             
-            .game-section:nth-child(even) .game-text {
-                padding-left: 0;
+            .modal-screenshots {
+                height: 350px;
             }
             
-            .game-screenshots {
-                height: 400px;
+            .nav-links {
+                gap: 20px;
             }
         }
 
         @media (max-width: 768px) {
-            .hero-logo {
-                width: 90%;
-            }
-            
-            .hero-title {
-                font-size: 2.5rem;
-            }
-            
-            .about-title, .products-title {
-                font-size: 2.3rem;
-            }
-            
-            .header-motto {
-                display: none;
-            }
-            
-            .about-section, .game-section {
-                padding: 60px 5%;
-            }
-            
-            .game-title {
-                font-size: 2rem;
-            }
-            
-            .game-screenshots {
-                height: 300px;
-            }
-            
-            .game-header {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                background: rgba(10, 25, 47, 0.98);
+                backdrop-filter: blur(10px);
                 flex-direction: column;
-                align-items: flex-start;
+                padding: 100px 30px 30px;
+                gap: 25px;
+                transition: var(--transition);
+                border-right: 1px solid rgba(255, 255, 255, 0.1);
+                z-index: 999;
             }
             
-            .game-icon {
-                margin-bottom: 15px;
+            .nav-links.active {
+                left: 0;
             }
-        }
-
-        @media (max-width: 480px) {
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
             .hero-title {
-                font-size: 2rem;
+                font-size: 2.8rem;
             }
             
-            .about-title, .products-title {
-                font-size: 1.8rem;
+            .hero-subtitle {
+                font-size: 1.2rem;
+                padding: 0 20px;
             }
             
-            .about-description {
-                font-size: 1.1rem;
+            .hero-btns {
+                flex-direction: column;
+                align-items: center;
             }
             
-            .game-title {
-                font-size: 1.8rem;
+            .section-title {
+                font-size: 2.2rem;
             }
             
-            .game-screenshots {
-                height: 250px;
+            .about-content {
+                padding: 40px 25px;
+            }
+            
+            .modal-body {
+                padding: 25px;
+            }
+            
+            .modal-screenshots {
+                height: 300px;
             }
             
             .game-buttons {
@@ -538,90 +725,297 @@
             }
             
             .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .hero-logo {
+                width: 95%;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .game-header {
+                flex-direction: column;
                 text-align: center;
+                gap: 15px;
             }
             
-            .screenshot-arrows {
-                padding: 0 10px;
+            .game-title {
+                font-size: 1.5rem;
             }
             
-            .arrow {
-                width: 30px;
-                height: 30px;
-                font-size: 16px;
+            .footer-grid {
+                grid-template-columns: 1fr;
             }
+            
+            .modal-screenshots {
+                height: 250px;
+            }
+            
+            .modal-game-title {
+                font-size: 1.8rem;
+            }
+            
+            .games-filter {
+                gap: 10px;
+            }
+            
+            .filter-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .nav-links {
+                gap: 15px;
+            }
+            
+            .nav-links a {
+                font-size: 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out both;
+        }
+        
+        /* Overlay for mobile menu */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 </head>
 <body>
-    <!-- Шапка -->
-    <header id="main-header">
-        <div class="header-logo">
-            <img src="Logo.jpeg" alt="PlayTrain" class="logo-small">
-            <span class="company-name">PlayTrain</span>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-content">
+            <a href="#" class="logo-brand">
+                <img src="Logo.jpeg" alt="PlayTrain" class="logo-small">
+                <div class="brand-text">
+                    <h1>PlayTrain</h1>
+                    <p>Путешествуй по рельсам!</p>
+                </div>
+            </a>
+            
+            <button class="mobile-menu-btn" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <nav class="nav-links" id="navLinks">
+                <a href="#home">Главная</a>
+                <a href="#about">О компании</a>
+                <a href="#games">Наши игры</a>
+                <a href="#footer">Контакты</a>
+            </nav>
         </div>
-        <div class="header-motto">Путешествуй по рельсам!</div>
     </header>
+    
+    <!-- Overlay for mobile menu -->
+    <div class="menu-overlay" id="menuOverlay"></div>
 
-    <!-- Первый экран -->
-    <section class="hero" id="hero">
+    <!-- Hero Section -->
+    <section class="hero" id="home">
         <img src="Logo.png" alt="PlayTrain" class="hero-logo">
         <h1 class="hero-title">PlayTrain Company</h1>
-    </section>
-
-    <!-- Секция "О компании" -->
+        <p class="hero-subtitle">Создаём качественные 2D-симуляторы поездов для Android. Погрузитесь в атмосферу рельсовых путешествий по просторам России.</p>
+        
+        <div class="hero-btns">
+            <a href="#games" class="btn">Наши игры <i class="fas fa-arrow-down"></i></a>
+            <a href="https://t.me/traingame127" class="btn btn-telegram">
+                <i class="fab fa-telegram"></i> Telegram
+            </a>
+        </div>
+    </section>  
+<!-- About Section -->
     <section class="about-section" id="about">
-        <div class="about-content">
-            <h2 class="about-title">О компании</h2>
-            <p class="about-description">
-                PlayTrain — студия разработки качественных 2D-симуляторов поездов для Android. 
-                Наши игры, доступные в RuStore, предлагают реалистичный опыт управления железнодорожным транспортом 
-                и погружают в атмосферу рельсовых путешествий по просторам России.
-            </p>
+        <div class="container">
+            <h2 class="section-title">О компании</h2>
+            <div class="about-content fade-in">
+                <p class="about-text">
+                    PlayTrain — студия разработки качественных 2D-симуляторов поездов для Android. 
+                    Наши игры, доступные в RuStore, предлагают реалистичный опыт управления железнодорожным транспортом 
+                    и погружают в атмосферу рельсовых путешествий по просторам России.
+                </p>
+            </div>
         </div>
     </section>
 
-    <!-- Секция "Наши продукты" -->
-    <section class="products-title-section" id="products-title">
-        <h2 class="products-title">Наши продукты</h2>
-    </section>
-
-    <!-- Секция с игрой 1 -->
-    <section class="game-section" id="game1">
-        <div class="game-container">
-            <div class="game-text">
-                <div class="game-header">
-                    <img src="Long Distance Train/icon.jpeg" alt="Long Distance Train" class="game-icon">
-                    <h2 class="game-title">Long Distance Train</h2>
+    <!-- Games Section -->
+    <section class="games-section" id="games">
+        <div class="container">
+            <h2 class="section-title">Наши продукты</h2>
+            
+            <div class="games-filter">
+                <button class="filter-btn active" data-filter="all">Все игры</button>
+                <button class="filter-btn" data-filter="passenger">Пассажирские</button>
+                <button class="filter-btn" data-filter="freight">Грузовые</button>
+                <button class="filter-btn" data-filter="mixed">Смешанные</button>
+            </div>
+            
+            <div class="games-grid">
+                <!-- Game 1 -->
+                <div class="game-card fade-in" data-category="passenger">
+                    <div class="game-header">
+                        <img src="Long Distance Train/icon.jpeg" alt="Long Distance Train" class="game-icon">
+                        <h3 class="game-title">Long Distance Train</h3>
+                    </div>
+                    <p class="game-description">
+                        Long Distance Train — симулятор поезда дальнего следования по российским железнодорожным маршрутам. 
+                        Погрузитесь в атмосферу настоящего железнодорожного путешествия, управляйте современными поездами 
+                        и преодолевайте расстояния, охватывающие всю страну.
+                    </p>
+                    <ul class="game-features">
+                        <li>Реалистичные маршруты по всей России</li>
+                        <li>Аутентичные вагоны и поезда</li>
+                        <li>Возможность прокладывать собственные маршруты</li>
+                        <li>Потрясающие пейзажи и атмосфера путешествия</li>
+                    </ul>
+                    <div class="game-buttons">
+                        <a href="https://www.rustore.ru/catalog/app/com.PlayTrain.LongDistanceTrain" class="btn btn-rustore">
+                            <i class="fas fa-download"></i> RuStore
+                        </a>
+                        <button class="btn game-detail-btn" data-game="1">
+                            <i class="fas fa-info-circle"></i> Подробнее
+                        </button>
+                    </div>
                 </div>
-                <p class="game-description">
-                    Long Distance Train — симулятор поезда дальнего следования по российским железнодорожным маршрутам. 
-                    Погрузитесь в атмосферу настоящего железнодорожного путешествия, управляйте современными поездами 
-                    и преодолевайте расстояния, охватывающие всю страну. В игре вас ждут реалистичные маршруты, 
-                    аутентичные вагоны и возможность прокладывать свой маршрут, наслаждаясь красотами российских пейзажей.
-                </p>
-                <ul class="game-features">
-                    <li>Реалистичные маршруты по всей России</li>
-                    <li>Аутентичные вагоны и поезда</li>
-                    <li>Возможность прокладывать собственные маршруты</li>
-                    <li>Потрясающие пейзажи и атмосфера путешествия</li>
-                </ul>
-                <div class="game-buttons">
-                    <a href="https://www.rustore.ru/catalog/app/com.PlayTrain.LongDistanceTrain" class="btn btn-rustore">Скачать в RuStore</a>
+                
+                <!-- Game 2 -->
+                <div class="game-card fade-in" data-category="freight">
+                    <div class="game-header">
+                        <img src="BMO/icon.jpeg" alt="Train Simulator BMO" class="game-icon">
+                        <h3 class="game-title">Train Simulator BMO</h3>
+                    </div>
+                    <p class="game-description">
+                        Погрузитесь в атмосферу реалистичных грузовых перевозок на легендарных советских и российских тепловозах! 
+                        Вам предстоит управлять мощными локомотивами серий 2ТЭ116, 2ТЭ10М 2ТЭ25Км, 2ТЭ10МК и 2ТЭ116У.
+                    </p>
+                    <ul class="game-features">
+                        <li>Разнообразные грузы: обычные товары, специальные перевозки</li>
+                        <li>Реалистичные тепловозы: 2ТЭ116, 2ТЭ10М, 2ТЭ10МК, 2ТЭ116У</li>
+                        <li>Динамичный мир с другими поездами и меняющейся погодой</li>
+                        <li>Реалистичное управление с физикой движения</li>
+                    </ul>
+                    <div class="game-buttons">
+                        <a href="https://www.rustore.ru/catalog/app/com.playtrain.freighttrain2025bmo" class="btn btn-rustore">
+                            <i class="fas fa-download"></i> RuStore
+                        </a>
+                        <button class="btn game-detail-btn" data-game="2">
+                            <i class="fas fa-info-circle"></i> Подробнее
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Game 3 -->
+                <div class="game-card fade-in" data-category="mixed">
+                    <div class="game-header">
+                        <img src="TRAIN 3/icon.jpeg" alt="TRAIN 3" class="game-icon">
+                        <h3 class="game-title">TRAIN 3</h3>
+                    </div>
+                    <p class="game-description">
+                        Уникальная игра с тремя видами железнодорожного движения в одной игре: маневровое, грузовое и пассажирское. 
+                        Более 100 локомотивов и поездов, которые можно встретить в игре!
+                    </p>
+                    <ul class="game-features">
+                        <li>3 вида железнодорожного движения в одной игре</li>
+                        <li>Более 100 локомотивов и поездов</li>
+                        <li>Система смены дня и ночи</li>
+                        <li>Мини-карта текущего маршрута</li>
+                    </ul>
+                    <div class="game-buttons">
+                        <a href="https://www.rustore.ru/catalog/app/com.DefaultCompany.Train3" class="btn btn-rustore">
+                            <i class="fas fa-download"></i> RuStore
+                        </a>
+                        <button class="btn game-detail-btn" data-game="3">
+                            <i class="fas fa-info-circle"></i> Подробнее
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Game 4 -->
+                <div class="game-card fade-in" data-category="passenger">
+                    <div class="game-header">
+                        <img src="MCD/icon.jpeg" alt="МЦД Электрички" class="game-icon">
+                        <h3 class="game-title">МЦД Электрички</h3>
+                    </div>
+                    <p class="game-description">
+                        Ты - опытный машинист московской электрички! Выбери свой любимый электропоезд, и в путь! 
+                        Исследуй Москву, соблюдай скоростной режим, и делай все обязанности настоящего машиниста!
+                    </p>
+                    <ul class="game-features">
+                        <li>Электропоезда: ЭГ2Тв "Иволга", ЭД4М, ЭП2Д</li>
+                        <li>Реалистичные переезды и люди на станциях</li>
+                        <li>Города и леса, время суток по реальному времени</li>
+                        <li>Постоянное пополнение списка электропоездов</li>
+                    </ul>
+                    <div class="game-buttons">
+                        <a href="https://www.rustore.ru/catalog/app/com.PlayTrain.MCDTrain" class="btn btn-rustore">
+                            <i class="fas fa-download"></i> RuStore
+                        </a>
+                        <button class="btn game-detail-btn" data-game="4">
+                            <i class="fas fa-info-circle"></i> Подробнее
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="game-screenshots">
-                <img src="Long Distance Train/screen1.jpeg" alt="Скриншот 1" class="screenshot active">
-                <img src="Long Distance Train/screen2.jpeg" alt="Скриншот 2" class="screenshot">
-                <img src="Long Distance Train/screen3.jpeg" alt="Скриншот 3" class="screenshot">
-                <img src="Long Distance Train/screen4.jpeg" alt="Скриншот 4" class="screenshot">
-                <img src="Long Distance Train/screen5.jpeg" alt="Скриншот 5" class="screenshot">
-                <img src="Long Distance Train/screen6.jpeg" alt="Скриншот 6" class="screenshot">
-                <img src="Long Distance Train/screen7.jpeg" alt="Скриншот 7" class="screenshot">
-                <img src="Long Distance Train/screen8.jpeg" alt="Скриншот 8" class="screenshot">
-                <div class="screenshot-arrows">
-                    <div class="arrow prev">‹</div>
-                    <div class="arrow next">›</div>
+        </div>
+    </section>
+
+    <!-- Game Detail Modals -->
+    <!-- Modal 1: Long Distance Train -->
+    <div class="game-modal" id="gameModal1">
+        <div class="modal-content">
+            <div class="modal-close"><i class="fas fa-times"></i></div>
+            <div class="modal-screenshots">
+                <div class="screenshot-slider">
+                    <img src="Long Distance Train/screen1.jpeg" class="modal-screenshot">
+                    <img src="Long Distance Train/screen2.jpeg" class="modal-screenshot">
+                    <img src="Long Distance Train/screen3.jpeg" class="modal-screenshot">
+                    <img src="Long Distance Train/screen4.jpeg" class="modal-screenshot">
+                    <img src="Long Distance Train/screen5.jpeg" class="modal-screenshot">
+                    <img src="Long Distance Train/screen6.jpeg" class="modal-screenshot">
+                    <img src="Long Distance Train/screen7.jpeg" class="modal-screenshot">
+                    <img src="Long Distance Train/screen8.jpeg" class="modal-screenshot">
+                </div>
+                <div class="modal-arrows">
+                    <div class="modal-arrow prev-arrow"><i class="fas fa-chevron-left"></i></div>
+                    <div class="modal-arrow next-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
                 <div class="screenshot-nav">
                     <div class="nav-dot active" data-index="0"></div>
@@ -634,18 +1028,60 @@
                     <div class="nav-dot" data-index="7"></div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Секция с игрой 2 -->
-    <section class="game-section" id="game2">
-        <div class="game-container">
-            <div class="game-text">
-                <div class="game-header">
-                    <img src="BMO/icon.jpeg" alt="Train Simulator BMO" class="game-icon">
-                    <h2 class="game-title">Train Simulator BMO</h2>
+            <div class="modal-body">
+                <h2 class="modal-game-title">Long Distance Train</h2>
+                <p class="about-text">
+                    Long Distance Train — симулятор поезда дальнего следования по российским железнодорожным маршрутам. 
+                    Погрузитесь в атмосферу настоящего железнодорожного путешествия, управляйте современными поездами 
+                    и преодолевайте расстояния, охватывающие всю страну. В игре вас ждут реалистичные маршруты, 
+                    аутентичные вагоны и возможность прокладывать свой маршрут, наслаждаясь красотами российских пейзажей.
+                </p>
+                <ul class="game-features">
+                    <li>Реалистичные маршруты по всей России</li>
+                    <li>Аутентичные вагоны и поезда</li>
+                    <li>Возможность прокладывать собственные маршруты</li>
+                    <li>Потрясающие пейзажи и атмосфера путешествия</li>
+                </ul>
+                <div class="game-buttons">
+                    <a href="https://www.rustore.ru/catalog/app/com.PlayTrain.LongDistanceTrain" class="btn btn-rustore">
+                        <i class="fas fa-download"></i> Скачать в RuStore
+                    </a>
                 </div>
-                <p class="game-description">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Train Simulator BMO -->
+    <div class="game-modal" id="gameModal2">
+        <div class="modal-content">
+            <div class="modal-close"><i class="fas fa-times"></i></div>
+            <div class="modal-screenshots">
+                <div class="screenshot-slider">
+                    <img src="BMO/screen1.jpeg" class="modal-screenshot">
+                    <img src="BMO/screen2.jpeg" class="modal-screenshot">
+                    <img src="BMO/screen3.jpeg" class="modal-screenshot">
+                    <img src="BMO/screen4.jpeg" class="modal-screenshot">
+                    <img src="BMO/screen5.jpeg" class="modal-screenshot">
+                    <img src="BMO/screen6.jpeg" class="modal-screenshot">
+                    <img src="BMO/screen7.jpeg" class="modal-screenshot">
+                </div>
+                <div class="modal-arrows">
+                    <div class="modal-arrow prev-arrow"><i class="fas fa-chevron-left"></i></div>
+                    <div class="modal-arrow next-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+                <div class="screenshot-nav">
+                    <div class="nav-dot active" data-index="0"></div>
+                    <div class="nav-dot" data-index="1"></div>
+                    <div class="nav-dot" data-index="2"></div>
+                    <div class="nav-dot" data-index="3"></div>
+                    <div class="nav-dot" data-index="4"></div>
+                    <div class="nav-dot" data-index="5"></div>
+                    <div class="nav-dot" data-index="6"></div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <h2 class="modal-game-title">Train Simulator BMO</h2>
+                <p class="about-text">
                     Погрузитесь в атмосферу реалистичных грузовых перевозок на легендарных советских и российских тепловозах! 
                     Вам предстоит управлять мощными локомотивами серий 2ТЭ116, 2ТЭ10М 2ТЭ25Км, 2ТЭ10МК и 2ТЭ116У, 
                     перевозя разнообразные грузы по Большому Московскому Областному кольцу (БМО).
@@ -658,20 +1094,32 @@
                     <li>Реалистичное управление с физикой движения и работой с тормозами</li>
                 </ul>
                 <div class="game-buttons">
-                    <a href="https://www.rustore.ru/catalog/app/com.playtrain.freighttrain2025bmo" class="btn btn-rustore">Скачать в RuStore</a>
+                    <a href="https://www.rustore.ru/catalog/app/com.playtrain.freighttrain2025bmo" class="btn btn-rustore">
+                        <i class="fas fa-download"></i> Скачать в RuStore
+                    </a>
                 </div>
             </div>
-            <div class="game-screenshots">
-                <img src="BMO/screen1.jpeg" alt="Скриншот 1" class="screenshot active">
-                <img src="BMO/screen2.jpeg" alt="Скриншот 2" class="screenshot">
-                <img src="BMO/screen3.jpeg" alt="Скриншот 3" class="screenshot">
-                <img src="BMO/screen4.jpeg" alt="Скриншот 4" class="screenshot">
-                <img src="BMO/screen5.jpeg" alt="Скриншот 5" class="screenshot">
-                <img src="BMO/screen6.jpeg" alt="Скриншот 6" class="screenshot">
-                <img src="BMO/screen7.jpeg" alt="Скриншот 7" class="screenshot">
-                <div class="screenshot-arrows">
-                    <div class="arrow prev">‹</div>
-                    <div class="arrow next">›</div>
+        </div>
+    </div>
+
+    <!-- Modal 3: TRAIN 3 -->
+    <div class="game-modal" id="gameModal3">
+        <div class="modal-content">
+            <div class="modal-close"><i class="fas fa-times"></i></div>
+            <div class="modal-screenshots">
+                <div class="screenshot-slider">
+                    <img src="TRAIN 3/screen1.jpeg" class="modal-screenshot">
+                    <img src="TRAIN 3/screen2.jpeg" class="modal-screenshot">
+                    <img src="TRAIN 3/screen3.jpeg" class="modal-screenshot">
+                    <img src="TRAIN 3/screen4.jpeg" class="modal-screenshot">
+                    <img src="TRAIN 3/screen5.jpeg" class="modal-screenshot">
+                    <img src="TRAIN 3/screen6.jpeg" class="modal-screenshot">
+                    <img src="TRAIN 3/screen7.jpeg" class="modal-screenshot">
+                    <img src="TRAIN 3/screen8.jpeg" class="modal-screenshot">
+                </div>
+                <div class="modal-arrows">
+                    <div class="modal-arrow prev-arrow"><i class="fas fa-chevron-left"></i></div>
+                    <div class="modal-arrow next-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
                 <div class="screenshot-nav">
                     <div class="nav-dot active" data-index="0"></div>
@@ -681,20 +1129,12 @@
                     <div class="nav-dot" data-index="4"></div>
                     <div class="nav-dot" data-index="5"></div>
                     <div class="nav-dot" data-index="6"></div>
+                    <div class="nav-dot" data-index="7"></div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Секция с игрой 3 -->
-    <section class="game-section" id="game3">
-        <div class="game-container">
-            <div class="game-text">
-                <div class="game-header">
-                    <img src="TRAIN 3/icon.jpeg" alt="TRAIN 3" class="game-icon">
-                    <h2 class="game-title">TRAIN 3</h2>
-                </div>
-                <p class="game-description">
+            <div class="modal-body">
+                <h2 class="modal-game-title">TRAIN 3</h2>
+                <p class="about-text">
                     Уникальная игра с тремя видами железнодорожного движения в одной игре: маневровое, грузовое и пассажирское. 
                     Более 100 локомотивов и поездов, которые можно встретить в игре, и более 80 видов локомотивов в вашем распоряжении!
                 </p>
@@ -708,45 +1148,39 @@
                     <li>Мини-карта текущего маршрута и система просмотра всего состава</li>
                 </ul>
                 <div class="game-buttons">
-                    <a href="https://www.rustore.ru/catalog/app/com.DefaultCompany.Train3" class="btn btn-rustore">Скачать в RuStore</a>
+                    <a href="https://www.rustore.ru/catalog/app/com.DefaultCompany.Train3" class="btn btn-rustore">
+                        <i class="fas fa-download"></i> Скачать в RuStore
+                    </a>
                 </div>
             </div>
-            <div class="game-screenshots">
-                <img src="TRAIN 3/screen1.jpeg" alt="Скриншот 1" class="screenshot active">
-                <img src="TRAIN 3/screen2.jpeg" alt="Скриншот 2" class="screenshot">
-                <img src="TRAIN 3/screen3.jpeg" alt="Скриншот 3" class="screenshot">
-                <img src="TRAIN 3/screen4.jpeg" alt="Скриншот 4" class="screenshot">
-                <img src="TRAIN 3/screen5.jpeg" alt="Скриншот 5" class="screenshot">
-                <img src="TRAIN 3/screen6.jpeg" alt="Скриншот 6" class="screenshot">
-                <img src="TRAIN 3/screen7.jpeg" alt="Скриншот 7" class="screenshot">
-                <img src="TRAIN 3/screen8.jpeg" alt="Скриншот 8" class="screenshot">
-                <div class="screenshot-arrows">
-                    <div class="arrow prev">‹</div>
-                    <div class="arrow next">›</div>
+        </div>
+    </div>
+
+    <!-- Modal 4: МЦД Электрички -->
+    <div class="game-modal" id="gameModal4">
+        <div class="modal-content">
+            <div class="modal-close"><i class="fas fa-times"></i></div>
+            <div class="modal-screenshots">
+                <div class="screenshot-slider">
+                    <img src="MCD/screen1.jpeg" class="modal-screenshot">
+                    <img src="MCD/screen2.jpeg" class="modal-screenshot">
+                    <img src="MCD/screen3.jpeg" class="modal-screenshot">
+                    <img src="MCD/screen4.jpeg" class="modal-screenshot">
+                </div>
+                <div class="modal-arrows">
+                    <div class="modal-arrow prev-arrow"><i class="fas fa-chevron-left"></i></div>
+                    <div class="modal-arrow next-arrow"><i class="fas fa-chevron-right"></i></div>
                 </div>
                 <div class="screenshot-nav">
                     <div class="nav-dot active" data-index="0"></div>
                     <div class="nav-dot" data-index="1"></div>
                     <div class="nav-dot" data-index="2"></div>
                     <div class="nav-dot" data-index="3"></div>
-                    <div class="nav-dot" data-index="4"></div>
-                    <div class="nav-dot" data-index="5"></div>
-                    <div class="nav-dot" data-index="6"></div>
-                    <div class="nav-dot" data-index="7"></div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Секция с игрой 4 -->
-    <section class="game-section" id="game4">
-        <div class="game-container">
-            <div class="game-text">
-                <div class="game-header">
-                    <img src="MCD/icon.jpeg" alt="МЦД Электрички" class="game-icon">
-                    <h2 class="game-title">МЦД Электрички. Московские Центральные Диаметры 2D</h2>
-                </div>
-                <p class="game-description">
+            <div class="modal-body">
+                <h2 class="modal-game-title">МЦД Электрички. Московские Центральные Диаметры 2D</h2>
+                <p class="about-text">
                     Ты - опытный машинист московской электрички! Выбери свой любимый электропоезд, и в путь! 
                     Исследуй Москву, соблюдай скоростной режим, и делай все обязанности настоящего машиниста!
                 </p>
@@ -758,153 +1192,255 @@
                     <li>Увлекательный геймплей без возможности заскучать</li>
                 </ul>
                 <div class="game-buttons">
-                    <a href="https://www.rustore.ru/catalog/app/com.PlayTrain.MCDTrain" class="btn btn-rustore">Скачать в RuStore</a>
-                </div>
-            </div>
-            <div class="game-screenshots horizontal-screenshots">
-                <img src="MCD/screen1.jpeg" alt="Скриншот 1" class="screenshot active">
-                <img src="MCD/screen2.jpeg" alt="Скриншот 2" class="screenshot">
-                <img src="MCD/screen3.jpeg" alt="Скриншот 3" class="screenshot">
-                <img src="MCD/screen4.jpeg" alt="Скриншот 4" class="screenshot">
-                <div class="screenshot-arrows">
-                    <div class="arrow prev">‹</div>
-                    <div class="arrow next">›</div>
-                </div>
-                <div class="screenshot-nav">
-                    <div class="nav-dot active" data-index="0"></div>
-                    <div class="nav-dot" data-index="1"></div>
-                    <div class="nav-dot" data-index="2"></div>
-                    <div class="nav-dot" data-index="3"></div>
+                    <a href="https://www.rustore.ru/catalog/app/com.PlayTrain.MCDTrain" class="btn btn-rustore">
+                        <i class="fas fa-download"></i> Скачать в RuStore
+                    </a>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Подвал -->
-    <footer>
-        <div class="footer-content">
-            <img src="Logo.jpeg" alt="PlayTrain" class="footer-logo">
-            <p>PlayTrain Company - разработчик качественных железнодорожных симуляторов</p>
-            
-            <div class="telegram-promo">
-                <h3>Следите за нашими новостями!</h3>
-                <p>Узнавайте первыми о новых играх, обновлениях и специальных предложениях</p>
-                <a href="https://t.me/traingame127" class="btn btn-telegram">
-                    <img src="TG.png" alt="Telegram" class="tg-icon">
-                    Подписаться на Telegram-канал
-                </a>
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <img src="Logo.jpeg" alt="PlayTrain" class="footer-logo">
+                    <p class="footer-about">
+                        PlayTrain — студия разработки качественных 2D-симуляторов поездов для Android.
+                    </p>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Наши игры</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" class="game-detail-btn" data-game="1">Long Distance Train</a></li>
+                        <li><a href="#" class="game-detail-btn" data-game="2">Train Simulator BMO</a></li>
+                        <li><a href="#" class="game-detail-btn" data-game="3">TRAIN 3</a></li>
+                        <li><a href="#" class="game-detail-btn" data-game="4">МЦД Электрички</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Свяжитесь с нами</h3>
+                    <div class="telegram-promo">
+                        <h4>Следите за новостями!</h4>
+                        <p>Узнавайте первыми о новых играх и обновлениях</p>
+                        <a href="https://t.me/traingame127" class="btn btn-telegram" style="margin-top: 15px;">
+                            <i class="fab fa-telegram"></i> Подписаться на канал
+                        </a>
+                    </div>
+                </div>
             </div>
             
             <div class="developer-info">
                 <img src="aleson2021.jpg" alt="ALESON" class="developer-avatar">
-                <div class="developer-text">Website by ALESON 2021</div>
+                <div class="developer-text">
+                    <p>Веб-сайт разработан ALESON 2021</p>
+                    <p>Все изображения и материалы принадлежат PlayTrain Company</p>
+                </div>
             </div>
             
-            <p class="copyright">© 2025 PlayTrain. Все права защищены.</p>
+            <div class="copyright">
+                <p>&copy; 2025 PlayTrain Company. Все права защищены.</p>
+            </div>
         </div>
     </footer>
 
     <script>
-        // Упрощенная анимация появления элементов
         document.addEventListener('DOMContentLoaded', function() {
-            const hero = document.getElementById('hero');
-            const header = document.getElementById('main-header');
-            const aboutSection = document.getElementById('about');
-            const productsTitle = document.getElementById('products-title');
-            const gameSections = document.querySelectorAll('.game-section');
-            
-            // Сразу показываем герой-секцию
-            setTimeout(() => {
-                hero.classList.add('visible');
-            }, 300);
-            
-            // Обработчик скролла
-            window.addEventListener('scroll', function() {
-                const scrollY = window.scrollY;
-                const windowHeight = window.innerHeight;
-                
-                // Показываем/скрываем герой-секцию
-                if (scrollY > windowHeight * 0.3) {
-                    hero.style.opacity = Math.max(0, 1 - (scrollY - windowHeight * 0.3) / (windowHeight * 0.3));
+            // Header scroll effect
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
                 } else {
-                    hero.style.opacity = 1;
+                    header.classList.remove('scrolled');
                 }
-                
-                // Показываем шапку после скролла
-                if (scrollY > windowHeight * 0.5) {
-                    header.classList.add('visible');
-                } else {
-                    header.classList.remove('visible');
-                }
-                
-                // Показываем секцию "О компании"
-                const aboutTop = aboutSection.getBoundingClientRect().top;
-                if (aboutTop < windowHeight * 0.8) {
-                    aboutSection.classList.add('active');
-                }
-                
-                // Показываем заголовок "Наши продукты"
-                const productsTop = productsTitle.getBoundingClientRect().top;
-                if (productsTop < windowHeight * 0.8) {
-                    productsTitle.classList.add('active');
-                }
-                
-                // Показываем секции игр при скролле
-                gameSections.forEach(section => {
-                    const sectionTop = section.getBoundingClientRect().top;
-                    if (sectionTop < windowHeight * 0.8) {
-                        section.classList.add('active');
+            });
+
+            // Mobile menu
+            const menuBtn = document.getElementById('menuBtn');
+            const navLinks = document.getElementById('navLinks');
+            const menuOverlay = document.getElementById('menuOverlay');
+            
+            function toggleMenu() {
+                navLinks.classList.toggle('active');
+                menuOverlay.classList.toggle('active');
+                menuBtn.innerHTML = navLinks.classList.contains('active') 
+                    ? '<i class="fas fa-times"></i>' 
+                    : '<i class="fas fa-bars"></i>';
+            }
+            
+            menuBtn.addEventListener('click', toggleMenu);
+            
+            // Close mobile menu when clicking overlay
+            menuOverlay.addEventListener('click', toggleMenu);
+
+            // Close mobile menu when clicking a link
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                    menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                });
+            });
+
+            // Game filter
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const gameCards = document.querySelectorAll('.game-card');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active button
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const filter = btn.getAttribute('data-filter');
+                    
+                    // Filter games
+                    gameCards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                            card.style.display = 'flex';
+                            card.classList.add('fade-in');
+                        } else {
+                            card.style.display = 'none';
+                            card.classList.remove('fade-in');
+                        }
+                    });
+                });
+            });
+
+            // Game detail modals
+            const gameModals = {
+                1: document.getElementById('gameModal1'),
+                2: document.getElementById('gameModal2'),
+                3: document.getElementById('gameModal3'),
+                4: document.getElementById('gameModal4')
+            };
+
+            document.querySelectorAll('.game-detail-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const gameId = this.getAttribute('data-game');
+                    const modal = gameModals[gameId];
+                    
+                    if (modal) {
+                        modal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                        
+                        // Initialize slider for this modal
+                        initSlider(modal);
                     }
                 });
             });
-            
-            // Инициализация карусели скриншотов
-            document.querySelectorAll('.game-screenshots').forEach(container => {
-                const dots = container.querySelectorAll('.nav-dot');
-                const screenshots = container.querySelectorAll('.screenshot');
-                const prevBtn = container.querySelector('.arrow.prev');
-                const nextBtn = container.querySelector('.arrow.next');
+
+            // Close modal
+            document.querySelectorAll('.modal-close').forEach(closeBtn => {
+                closeBtn.addEventListener('click', function() {
+                    const modal = this.closest('.game-modal');
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+
+            // Close modal on outside click
+            document.querySelectorAll('.game-modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.game-modal').forEach(modal => {
+                        modal.classList.remove('active');
+                    });
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Slider function
+            function initSlider(modal) {
+                const slider = modal.querySelector('.screenshot-slider');
+                const slides = modal.querySelectorAll('.modal-screenshot');
+                const dots = modal.querySelectorAll('.nav-dot');
+                const prevArrow = modal.querySelector('.prev-arrow');
+                const nextArrow = modal.querySelector('.next-arrow');
                 
-                let currentIndex = 0;
+                let currentSlide = 0;
+                let slideInterval;
                 
-                function showSlide(index) {
-                    dots.forEach(d => d.classList.remove('active'));
-                    screenshots.forEach(s => s.classList.remove('active'));
+                function updateSlider() {
+                    slider.style.transform = `translateX(-${currentSlide * 100}%)`;
                     
-                    dots[index].classList.add('active');
-                    screenshots[index].classList.add('active');
-                    
-                    currentIndex = index;
+                    dots.forEach((dot, index) => {
+                        dot.classList.toggle('active', index === currentSlide);
+                    });
                 }
                 
-                dots.forEach(dot => {
-                    dot.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        showSlide(index);
+                dots.forEach((dot, index) => {
+                    dot.addEventListener('click', () => {
+                        currentSlide = index;
+                        updateSlider();
+                        resetAutoSlide();
                     });
                 });
                 
-                prevBtn.addEventListener('click', function() {
-                    let newIndex = currentIndex - 1;
-                    if (newIndex < 0) newIndex = dots.length - 1;
-                    showSlide(newIndex);
+                prevArrow.addEventListener('click', () => {
+                    currentSlide = currentSlide > 0 ? currentSlide - 1 : slides.length - 1;
+                    updateSlider();
+                    resetAutoSlide();
                 });
                 
-                nextBtn.addEventListener('click', function() {
-                    let newIndex = currentIndex + 1;
-                    if (newIndex >= dots.length) newIndex = 0;
-                    showSlide(newIndex);
+                nextArrow.addEventListener('click', () => {
+                    currentSlide = currentSlide < slides.length - 1 ? currentSlide + 1 : 0;
+                    updateSlider();
+                    resetAutoSlide();
                 });
                 
-                // Автоматическое перелистывание
-                setInterval(() => {
-                    let newIndex = currentIndex + 1;
-                    if (newIndex >= dots.length) newIndex = 0;
-                    showSlide(newIndex);
-                }, 5000);
+                function startAutoSlide() {
+                    slideInterval = setInterval(() => {
+                        currentSlide = currentSlide < slides.length - 1 ? currentSlide + 1 : 0;
+                        updateSlider();
+                    }, 5000);
+                }
+                
+                function resetAutoSlide() {
+                    clearInterval(slideInterval);
+                    startAutoSlide();
+                }
+                
+                // Pause on hover
+                modal.addEventListener('mouseenter', () => clearInterval(slideInterval));
+                modal.addEventListener('mouseleave', startAutoSlide);
+                
+                updateSlider();
+                startAutoSlide();
+            }
+
+            // Fade-in animations on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.game-card, .about-content').forEach(el => {
+                observer.observe(el);
             });
         });
     </script>
 </body>
 </html>
-
